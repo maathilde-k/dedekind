@@ -13,7 +13,7 @@ open dReal
 namespace comm.group
 
 theorem add_comm (a b : dReal) : a.add b = b.add a := by
-  simp [dReal.add]
+  simp [dReal.add, dReal.addCut]
   ext x
   apply Iff.intro
   intro h
@@ -42,7 +42,7 @@ theorem add_comm (a b : dReal) : a.add b = b.add a := by
   exact ha.right
 
 theorem add_assoc (a b c : dReal) : (a.add b).add c = a.add (b.add c) := by
-  simp [dReal.add]
+  simp [dReal.add, dReal.addCut]
   ext x
   apply Iff.intro
   intro h
@@ -79,7 +79,7 @@ theorem add_assoc (a b c : dReal) : (a.add b).add c = a.add (b.add c) := by
 theorem zero_add (a : dReal) : dReal.zero.add a = a := by
   cases a with
     | mk cut hnt hcd hou =>
-      simp [dReal.zero, Rat.todReal, dReal, dReal.cut, dReal.add]
+      simp [dReal.zero, Rat.todReal, dReal, dReal.cut, dReal.add, dReal.addCut]
       ext x
       apply Iff.intro
       intro hx
@@ -156,7 +156,7 @@ lemma nat_dedekind2 (a : dReal) (x : ℚ) (hx :x>0) : ∃ n : ℤ, n * x ∉ a.c
   apply dedekind_lemma2 a (((q/x).ceil+1)*x) q hq h2
 
 theorem add_left_neg (a : dReal) : (a.neg).add a = dReal.zero := by
-  simp [dReal.neg, dReal.add, dReal.zero, dReal.negCut, Rat.todReal]
+  simp [dReal.neg, dReal.add, dReal.addCut, dReal.zero, dReal.negCut, Rat.todReal]
   ext x
   apply Iff.intro
   simp
@@ -233,7 +233,7 @@ lemma neg_preserves_equality (a b : dReal) : a = b → a.neg = b.neg := by
 
 -- do i need to prove this?
 lemma neg_distributes_over_addition (a b : dReal) : (a.add b).neg = a.neg.add b.neg := by
-  simp [dReal.neg, dReal.negCut, dReal.add]
+  simp [dReal.neg, dReal.negCut, dReal.add, dReal.addCut]
   ext x
   apply Iff.intro
   simp

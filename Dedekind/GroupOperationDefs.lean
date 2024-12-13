@@ -6,16 +6,14 @@ import Dedekind.Cut_Defs
 import Dedekind.CutLemmas
 open Dedekind.lemmas
 open Classical
--- open Dedekind.cutdefs
---instance : Coe ℚ dReal := ⟨Rat.todReal⟩
 
 def dReal.zero : dReal := Rat.todReal 0
 
 def dReal.add (a b: dReal) : dReal :=
   {
-    cut := { r : ℚ | ∃ p q : ℚ, (p ∈ a.cut ∧ q ∈ b.cut ∧ p + q = r)}
+    cut := dReal.addCut a b
     nontrivial := by
-      simp
+      simp [dReal.addCut]
       obtain ⟨pa1, hpa1⟩ := a.nontrivial.left
       obtain ⟨qa1, hqa1⟩ := a.nontrivial.right
       obtain ⟨pb1, hpb1⟩ := b.nontrivial.left
@@ -35,7 +33,7 @@ def dReal.add (a b: dReal) : dReal :=
       have h2 := dedekind_lemma1 b y qb1 hy hqb1
       linarith
     closedDownwards := by
-      simp
+      simp [dReal.addCut]
       intro r p hp q hq eq
       intro r2 hr2
       have h1 : r2 - r < 0 := by linarith
@@ -49,7 +47,7 @@ def dReal.add (a b: dReal) : dReal :=
       apply hq
       linarith
     openUpwards := by
-      simp
+      simp [dReal.addCut]
       intro r p hp q hq eq
       obtain ⟨r1, hr1⟩ := a.openUpwards p hp
       obtain ⟨r2, hr2⟩ := b.openUpwards q hq

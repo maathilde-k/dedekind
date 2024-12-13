@@ -740,8 +740,6 @@ lemma mul_assoc (a b c : dReal) : (a.mul b).mul c = a.mul (b.mul c) := by
       sorry
   sorry
 
-def dReal.one : dReal := Rat.todReal 1
-
 lemma ispos_one : ispos dReal.one := by
   simp [ispos, dReal.one, Rat.todReal]
   use 0.5

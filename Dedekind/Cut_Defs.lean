@@ -39,6 +39,8 @@ def Rat.todReal : ℚ → dReal :=
       linarith
   }
 
+  def dReal.addCut (a : dReal) (b : dReal) : Set ℚ := { r : ℚ | ∃ p q : ℚ, (p ∈ a.cut ∧ q ∈ b.cut ∧ p + q = r)}
+
   def dReal.negCut (a : dReal) : Set ℚ := {r : ℚ | ∃ e : ℚ, (e > 0) ∧ (- r - e ∉ a.cut)}
 
   def dReal.posmulCut (a b : dReal) (ha : ∃ p : ℚ, p ∈ a.cut ∧ p > 0) (hb : ∃ p : ℚ, p ∈ b.cut ∧ p > 0): Set ℚ := {r : ℚ | ∃ p q : ℚ, (p > 0) ∧ (p ∈ a.cut) ∧ (q > 0) ∧ (q ∈ b.cut) ∧ (r < p*q)}

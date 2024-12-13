@@ -181,7 +181,7 @@ lemma pos_lt_mul (x y x' y' : ℚ) (hx : 0 < x) (hy : 0 < y) (hxx' : x < x') (hy
   apply mul_lt_mul_of_pos_left hyy' (lt_trans hx hxx')
 
 lemma pos_add (a b : dReal ) (ha : ispos a) (hb : ispos b) : ispos (a.add b) := by
-  simp [ispos, dReal.add]
+  simp [ispos, dReal.add, dReal.addCut]
   obtain ⟨p, hp⟩ := ha
   obtain ⟨q, hq⟩ := hb
   use p
@@ -193,7 +193,7 @@ lemma pos_add (a b : dReal ) (ha : ispos a) (hb : ispos b) : ispos (a.add b) := 
   linarith
 
 lemma neg_add (a b : dReal ) (ha : isneg a) (hb : isneg b) : isneg (a.add b) := by
-  simp [isneg, dReal.add]
+  simp [isneg, dReal.add, dReal.addCut]
   obtain ⟨p, hp⟩ := ha
   obtain ⟨q, hq⟩ := hb
   apply And.intro
