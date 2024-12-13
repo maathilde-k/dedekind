@@ -155,6 +155,8 @@ lemma nat_dedekind2 (a : dReal) (x : ℚ) (hx :x>0) : ∃ n : ℤ, n * x ∉ a.c
   rw [←h3]
   apply dedekind_lemma2 a (((q/x).ceil+1)*x) q hq h2
 
+lemma nat_dedekind3 (a : dReal) (x : ℚ) (hx :x>0) : ∃ n : ℤ, n * x ∈ a.cut ∧ (n+1) * x ∉ a.cut := sorry
+
 theorem add_left_neg (a : dReal) : (a.neg).add a = dReal.zero := by
   simp [dReal.neg, dReal.add, dReal.addCut, dReal.zero, dReal.negCut, Rat.todReal]
   ext x
@@ -169,25 +171,22 @@ theorem add_left_neg (a : dReal) : (a.neg).add a = dReal.zero := by
   linarith
   simp
   intro hx
-  obtain ⟨s, hs⟩ := dedekind_sup a
   obtain ⟨p, hp⟩ :=  a.nontrivial.left
   have hx2 : -x/2 > 0 := by linarith
-  obtain ⟨n, hn⟩ := nat_dedekind1 a (-x/2) hx2
-  obtain ⟨m, hm⟩ := nat_dedekind2 a (-x/2) hx2
-  use (m+1)*x/2
+  obtain ⟨n, hn⟩ := nat_dedekind3 a (-x/2) hx2
+  obtain ⟨hn, hm⟩ := hn
+  use (n+2)*x/2
   apply And.intro
   use -x/2
   apply And.intro
   linarith
-  have h3 : -((m+1)*x/2) - - x/2 = m*(-x/2) := by ring_nf
+  have h3 : -((n+2)*x/2) - - x/2 = (n+1)*(-x/2) := by ring_nf
   rw [h3]
   apply hm
   use n*(-x/2)
   apply And.intro
   apply hn
   ring_nf
-
-  sorry
 
 lemma zero_neg_is_zero : dReal.zero = dReal.zero.neg := by
   simp [dReal.zero, dReal.neg, dReal.negCut, Rat.todReal]

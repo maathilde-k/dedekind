@@ -26,6 +26,22 @@ Adding Dedekind cuts is fairly straightforward too: we define a.add b as the set
 
 Negating Dedekind cuts is a less pleasant matter. 
 
+Multiplying Dedekind cuts is even worse. In fact, we only define cuts for multiplication of positive Dedekind reals: it is simply the set of rationals that are strictly less than the the product of two positive elements of the cuts. The definition of general multiplication will come later.
 
+## Elementary Lemmas 
 
+File `CutLemmas.lean`.
 
+## Dedekind cuts form a commutative group under addition
+
+File `GroupOperationDefs.lean` for definining identity, addition and negation. File `AddCommGroup.lean` for proving properties of addcommgroup.
+
+## Dedekind cuts form a commutative ring with multiplication
+
+Extend the comm group structure.
+
+File `RingOperationDefs.lean` for definining mul identity and multiplication (important and technical, first need to define positive multiplication). File `AddCommGroup.lean` for proving properties of addcommgroup.
+
+Before general multiplication, define what it means to be positive and negative in `SignDefs.lean` and prove some lemmas in `SignLemmas.lean`.
+
+File `CommRing.lean` for proving properties of addcommgroup. Discuss scaling difficulties involving associativity and distributivity due to the definition of multiplication and all the cases with multiplication.

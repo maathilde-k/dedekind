@@ -61,6 +61,8 @@ def dReal.add (a b: dReal) : dReal :=
       linarith
   }
 
+instance : Add dReal := ⟨dReal.add⟩
+
 def dReal.neg (a : dReal) : dReal := {
   cut := dReal.negCut a
   nontrivial := by
@@ -109,3 +111,5 @@ def dReal.neg (a : dReal) : dReal := {
     apply hrr'
     linarith
 }
+
+instance : Neg dReal := ⟨dReal.neg⟩
