@@ -52,7 +52,10 @@ Similarly, `dedekind_lemma2` expresses that if `p ∉ a` and `q > p`, then `q �
 
 Finally, `dedekind_sup` encodes that every dedekind cut has an upper bound: given a Dedekind cut `a` there is a rational `p` that is greater than all the elements in `a`.
 
-+ `nat_dedekind1`, `nat_dedekind2`, `nat_dedekind3`
+Additionally, the following three lemmas about Dedekind cuts of scaled integers provide structural insights:
+- `nat_dedekind1`: For a Dedekind cut `a` and a positive rational number `x > 0`, there exists an integer `n` such that `n * x ∈ a.cut`. This establishes the existence of scaled integers within a Dedekind cut.
+- `nat_dedekind2`: For a Dedekind cut a and a positive rational number `x > 0`, there exists an integer `n` such that `n * x ∉ a.cut`. This ensures that scaled integers can also fall outside a Dedekind cut. (the lemma is proven up to a small fact about ceilings that is not implemented in Mathlib)
+- `nat_dedekind3`: For a Dedekind cut a and a positive rational number `x > 0`, there exists an integer `n` such that `n * x ∈ a.cut` but `(n + 1) * x ∉ a.cut`. This lemma demonstrates a precise boundary behavior of Dedekind cuts with respect to scaled integers. (this lemma is not proven)
  
 ## Dedekind cuts form a commutative group under addition
 
@@ -81,7 +84,10 @@ A commutative ring `R` is a commutative group with a second operation `×` which
 
 Dedekind cuts also form a commutative ring with multiplication, extending the comm group structure.
 
-Before definining multiplication, we have to define what is meant by positive and negative. In Our definition, we chose to make `dReal.zero` neither positive nor negative. A positive Dedekind cut is one that contains a strictly positive rational number. A negative Dedekind cut is one that only contains negative rational numbers, but not all of them. `ispos` and `isneg` are propositions embodying the sign of a Dedekind cut. From there, `SignLemmas.lean` contains many useful lemmas on the sign of Dedekind Cuts: mutual exclusion, how they behave under addition and negation, ...
+Before definining multiplication, we have to define what is meant by positive and negative. In our definition, we chose to make `dReal.zero` neither positive nor negative. 
+- A positive Dedekind cut is one that contains a strictly positive rational number. 
+- A negative Dedekind cut is one that only contains negative rational numbers, but not all of them. 
+`ispos` and `isneg` are propositions embodying the sign of a Dedekind cut. From there, `SignLemmas.lean` contains many useful lemmas on the sign of Dedekind Cuts: mutual exclusion, how they behave under addition and negation, ...
 
 In the file `RingOperationDefs.lean`, we definine the multiplicative identity (`dReal.one = RatToReal 1`) and multiplication. Multiplication is surprisingly difficult to define. First we define multiplication for positive cuts, `posmul`. Then we define multiplication by cases on the sign of the Dedekind cut. Let `a` and `b` be Dedekind cuts. `a.mul b` is equal to:
     - `a.posmul b` if `a` and `b` are positive
@@ -91,4 +97,6 @@ In the file `RingOperationDefs.lean`, we definine the multiplicative identity (`
     - `dReal.zero` if either of them is zero.
 This case by case definition makes proving certain theorems quite difficult, specifically those involving three separate Dedekind cuts.
 
-In `CommRing.lean` we begin to prove that Dedekind cuts form a commutative ring. We successfully prove `zero_mul` and `mul_zero`, `mul_one`, `one_mul`, and `mul_com`, each time by proving these properties for the positive cuts before generalizing. The issues arise when we try to prove properties involving at least three Dedekind cuts. The definition of multiplication by cases means that proving something on three cuts means at least 27 cases (more in the case of distributivity). This also means that multiple lemma variants about positive multiplication must also be proven (at least three per property).
+In `CommRing.lean` we begin to prove that Dedekind cuts form a commutative ring. We successfully prove `zero_mul` and `mul_zero`, `mul_one`, `one_mul`, and `mul_com`, each time by proving these properties for the positive cuts before generalizing.
+
+The issues arise when we try to prove properties involving three Dedekind cuts. The definition of multiplication by cases means that proving something on three cuts means processing at least 27 cases (more in the case of distributivity). This also means that multiple lemma variants about positive multiplication must also be proven (at least three per property). For instance, in the case where `a`.`b`.`c` are three positive dedekind cuts, left distributivity reduces to `a.posmul (b.add c) = (a.posmul b).add (a.posmul c)`. However, if `b` is negative and `b.add c` is positive, left distributivity reduces to `a.posmul (b.add c) = (a.posmul b.neg).neg.add (a.posmul c)`, which cannot be reduced to the previous case. 
