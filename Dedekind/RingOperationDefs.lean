@@ -1,6 +1,5 @@
 import Mathlib.Data.Rat.Defs
 import Mathlib.Data.Rat.Floor
-import Mathlib.Algebra.Order.Archimedean
 import Dedekind.LoVelib
 import Dedekind.CutDefs
 import Dedekind.CutLemmas
@@ -11,7 +10,11 @@ open Dedekind.lemmas
 open sign.lemmas
 open Classical
 
+--========================= Multiplicative identity =========================
+
 def dReal.one : dReal := Rat.todReal 1
+
+--========================= Positive Multiplication =========================
 
 def dReal.posmul (a b: dReal) (ha : ispos a) (hb : ispos b): dReal :=
   {
@@ -90,9 +93,13 @@ def dReal.posmul (a b: dReal) (ha : ispos a) (hb : ispos b): dReal :=
       linarith
   }
 
+--========================= General Multiplication =========================
+
 noncomputable def dReal.mul (a b: dReal) : dReal :=
   if h : ispos a ∧ ispos b then dReal.posmul a b h.left h.right
   else if h : isneg a ∧ isneg b then dReal.posmul a.neg b.neg (isneg_neg a h.left) (isneg_neg b h.right)
   else if h : ispos a ∧ isneg b then (dReal.posmul a b.neg h.left (isneg_neg b h.right)).neg
   else if h : isneg a ∧ ispos b then (dReal.posmul a.neg b (isneg_neg a h.left) h.right).neg
   else dReal.zero
+
+noncomputable instance : Mul dReal := ⟨dReal.mul⟩

@@ -1,6 +1,5 @@
 import Mathlib.Data.Rat.Defs
 import Mathlib.Data.Rat.Floor
-import Mathlib.Algebra.Order.Archimedean
 import Dedekind.LoVelib
 import Dedekind.CutDefs
 import Dedekind.CutLemmas
@@ -10,6 +9,14 @@ open Dedekind.lemmas
 open Classical
 
 namespace sign.lemmas
+
+--====================== Useful Computational Lemma ======================
+
+lemma pos_lt_mul (x y x' y' : ℚ) (hx : 0 < x) (hy : 0 < y) (hxx' : x < x') (hyy' : y < y') : x*y < x'*y' := by
+  apply lt_trans (mul_lt_mul_of_pos_right hxx' hy)
+  apply mul_lt_mul_of_pos_left hyy' (lt_trans hx hxx')
+
+--====================== Sign Relation with Addition and Negation ======================
 
 lemma ispos_neg (a : dReal) : ispos a → isneg a.neg := by
   intro h
@@ -76,6 +83,53 @@ lemma isneg_negneg (a : dReal) : isneg a → isneg a.neg.neg := by
   apply ispos_neg
   apply isneg_neg
   exact h
+
+lemma pos_add (a b : dReal ) (ha : ispos a) (hb : ispos b) : ispos (a.add b) := by
+  simp [ispos, dReal.add, dReal.addCut]
+  obtain ⟨p, hp⟩ := ha
+  obtain ⟨q, hq⟩ := hb
+  use p
+  apply And.intro
+  apply hp.left
+  use q
+  apply And.intro
+  apply hq.left
+  linarith
+
+lemma neg_add (a b : dReal ) (ha : isneg a) (hb : isneg b) : isneg (a.add b) := by
+  simp [isneg, dReal.add, dReal.addCut]
+  obtain ⟨p, hp⟩ := ha
+  obtain ⟨q, hq⟩ := hb
+  apply And.intro
+  intro x y hy
+  apply Classical.by_contradiction
+  intro h
+  simp at h
+  obtain ⟨r, hr⟩ := h
+  have hr' : r = x - y := by linarith
+  have h1 : x - y ∈ b.cut := by
+    rw [hr'] at hr
+    exact hr.left
+  have hxyneg := q (x-y) h1
+  have hy_neg := p y hy
+  linarith
+  obtain ⟨p', hp⟩ := hp
+  use p'
+  apply And.intro
+  intro x y z hz
+  apply Classical.by_contradiction
+  intro h
+  simp at h
+  have hfalseq : x = p' - z := by linarith
+  have hxltp' := dedekind_lemma1 a x p' y hp.left
+  have hmz : -z > 0 := by
+    subst hfalseq
+    simp_all only [sub_add_cancel, gt_iff_lt, Left.neg_pos_iff]
+  have problem : x < p' - z := by linarith
+  linarith
+  apply hp.right
+
+--====================== Sign Relation with Zero ======================
 
 lemma zero_not_pos (a : dReal) (ha : a = dReal.zero) : ¬ ispos a := by
   intro h
@@ -156,6 +210,8 @@ lemma zero_iff_not_pos_not_neg (a : dReal) : a = dReal.zero ↔ ¬ ispos a ∧ �
   intro h
   apply zero_not_pos_not_neg a h
 
+--====================== Every Dedekind Cut is 0, Positive or Negative ======================
+
 lemma pos_or_neg_or_zero (a : dReal) : ispos a ∨ isneg a ∨ a = dReal.zero := by
   apply Classical.byCases
   intro h
@@ -175,54 +231,5 @@ lemma pos_or_neg_or_zero (a : dReal) : ispos a ∨ isneg a ∨ a = dReal.zero :=
     apply h
     apply h1
   apply (zero_iff_not_pos_not_neg a).mpr h2
-
-lemma pos_lt_mul (x y x' y' : ℚ) (hx : 0 < x) (hy : 0 < y) (hxx' : x < x') (hyy' : y < y') : x*y < x'*y' := by
-  apply lt_trans (mul_lt_mul_of_pos_right hxx' hy)
-  apply mul_lt_mul_of_pos_left hyy' (lt_trans hx hxx')
-
-lemma pos_add (a b : dReal ) (ha : ispos a) (hb : ispos b) : ispos (a.add b) := by
-  simp [ispos, dReal.add, dReal.addCut]
-  obtain ⟨p, hp⟩ := ha
-  obtain ⟨q, hq⟩ := hb
-  use p
-  apply And.intro
-  apply hp.left
-  use q
-  apply And.intro
-  apply hq.left
-  linarith
-
-lemma neg_add (a b : dReal ) (ha : isneg a) (hb : isneg b) : isneg (a.add b) := by
-  simp [isneg, dReal.add, dReal.addCut]
-  obtain ⟨p, hp⟩ := ha
-  obtain ⟨q, hq⟩ := hb
-  apply And.intro
-  intro x y hy
-  apply Classical.by_contradiction
-  intro h
-  simp at h
-  obtain ⟨r, hr⟩ := h
-  have hr' : r = x - y := by linarith
-  have h1 : x - y ∈ b.cut := by
-    rw [hr'] at hr
-    exact hr.left
-  have hxyneg := q (x-y) h1
-  have hy_neg := p y hy
-  linarith
-  obtain ⟨p', hp⟩ := hp
-  use p'
-  apply And.intro
-  intro x y z hz
-  apply Classical.by_contradiction
-  intro h
-  simp at h
-  have hfalseq : x = p' - z := by linarith
-  have hxltp' := dedekind_lemma1 a x p' y hp.left
-  have hmz : -z > 0 := by
-    subst hfalseq
-    simp_all only [sub_add_cancel, gt_iff_lt, Left.neg_pos_iff]
-  have problem : x < p' - z := by linarith
-  linarith
-  apply hp.right
 
   end sign.lemmas

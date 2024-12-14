@@ -329,6 +329,9 @@ theorem mul_one (a : dReal) : a.mul dReal.one = a := by
 
 --==================== Proving that multiplication is distributive ====================--
 
+/- to finish this proof, we would need to be able to prove that if `x > 0`
+  and `x = r + s` where `r ∈ a.cut` and `s ∈ b.cut` with `a` and `b` positive,
+  then `x = r' + s'` where `r' ∈ a.cut` and `s' ∈ b.cut` with `r' > 0` and `s' > 0`. -/
 lemma pos_left_distrib (a b c : dReal) (ha : ispos a) (hb : ispos b) (hc : ispos c) (hbc : ispos (b.add c)):  a.posmul (b.add c) ha hbc = (a.posmul b ha hb).add (a.posmul c ha hc) := by
   simp [dReal.posmul, dReal.posmulCut, dReal.add, dReal.addCut]
   simp_all [ispos]
@@ -343,18 +346,17 @@ lemma pos_left_distrib (a b c : dReal) (ha : ispos a) (hb : ispos b) (hc : ispos
     apply hrb
     use s
   rw [hrsq.symm] at hxpq
-  /- to finish this proof, we would need to be able to prove that if `x > 0`
-  and `x = r + s` where `r ∈ a.cut` and `s ∈ b.cut` with `a` and `b` positive,
-  then `x = r' + s'` where `r' ∈ a.cut` and `s' ∈ b.cut` with `r' > 0` and `s' > 0`. -/
   sorry
   simp
   intro u y hy0 hya z hz0 hzb hxyz p q hq0 hqa r hr0 hrc hpqr hupx
   sorry
 
+-- another flavor of the above lemma
 lemma pos_left_distrib_bneg (a b c : dReal) (ha : ispos a) (hb : ispos b.neg) (hc : ispos c) (hbc : ispos (b.add c)):  a.posmul (b.add c) ha hbc = (a.posmul b.neg ha hb).neg.add (a.posmul c ha hc) := by
   simp [dReal.posmul, dReal.posmulCut, dReal.add, dReal.addCut, pos_left_distrib]
   sorry
 
+-- another flavor of the above lemma
 lemma pos_left_distrib_cneg (a b c : dReal) (ha : ispos a) (hb : ispos b) (hc : ispos c.neg) (hbc : ispos (b.add c)):  a.posmul (b.add c) ha hbc = (a.posmul b ha hb).add (a.posmul c.neg ha hc).neg := by
   simp [dReal.posmul, dReal.posmulCut, dReal.add, dReal.addCut, pos_left_distrib]
   sorry
@@ -547,7 +549,7 @@ theorem left_distrib (a b c : dReal) : a.mul (b.add c) = (a.mul b).add (a.mul c)
           --apply neg_preserves_equality (a.posmul (b.add c).neg _ _) ((a.posmul b.neg _ _).add (a.posmul c.neg _ _))
           --simp [neg_preserves_equality] at heqneg2
           -- neg needs taking out
-          sorry -- taking a brek from this, probably need to use neg_preserves_equality, but first take out the neg of addition
+          sorry -- taking a break from this, probably need to use neg_preserves_equality, but first take out the neg of addition
   simp [ha]
   have hanegz : isneg a ∨ a = dReal.zero := by
     have h1 := pos_or_neg_or_zero a

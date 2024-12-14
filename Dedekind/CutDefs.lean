@@ -19,7 +19,8 @@ structure dReal :=
 
 instance : Membership ℚ (dReal) := ⟨fun p α => p ∈ α.cut⟩
 
--- Define how to convert a rational number to a Dedekind cut
+--======================= Dedekind Cuts from a Rational Number =======================
+
 def Rat.todReal : ℚ → dReal :=
   fun p => {
     cut := { r : ℚ | r < p }
@@ -47,11 +48,14 @@ def Rat.todReal : ℚ → dReal :=
 
 instance : Coe ℚ (dReal) := ⟨Rat.todReal⟩
 
--- Define addition of two Dedekind cuts
+--========================== Addition of Dedekind Cuts ==========================
+
 def dReal.addCut (a : dReal) (b : dReal) : Set ℚ := { r : ℚ | ∃ p q : ℚ, (p ∈ a.cut ∧ q ∈ b.cut ∧ p + q = r)}
 
--- Define negation of a Dedekind cut
+--========================== Negation of a Dedekind Cut ==========================
+
 def dReal.negCut (a : dReal) : Set ℚ := {r : ℚ | ∃ e : ℚ, (e > 0) ∧ (- r - e ∉ a.cut)}
 
--- Define multiplication of two positive Dedekind cuts
+--========================== Multiplication of Positive Dedekind Cuts ==========================
+
 def dReal.posmulCut (a b : dReal) (ha : ∃ p : ℚ, p ∈ a.cut ∧ p > 0) (hb : ∃ p : ℚ, p ∈ b.cut ∧ p > 0): Set ℚ := {r : ℚ | ∃ p q : ℚ, (p > 0) ∧ (p ∈ a.cut) ∧ (q > 0) ∧ (q ∈ b.cut) ∧ (r < p*q)}

@@ -1,13 +1,16 @@
 import Mathlib.Data.Rat.Defs
 import Mathlib.Data.Rat.Floor
-import Mathlib.Algebra.Order.Archimedean
 import Dedekind.LoVelib
 import Dedekind.CutDefs
 import Dedekind.CutLemmas
 open Dedekind.lemmas
 open Classical
 
+--===================== Additive Identity =====================
+
 def dReal.zero : dReal := Rat.todReal 0
+
+--===================== Addition =====================
 
 def dReal.add (a b: dReal) : dReal :=
   {
@@ -62,6 +65,8 @@ def dReal.add (a b: dReal) : dReal :=
   }
 
 instance : Add dReal := ⟨dReal.add⟩
+
+--===================== Additive Inverse =====================
 
 def dReal.neg (a : dReal) : dReal := {
   cut := dReal.negCut a

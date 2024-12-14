@@ -1,6 +1,5 @@
 import Mathlib.Data.Rat.Defs
 import Mathlib.Data.Rat.Floor
-import Mathlib.Algebra.Order.Archimedean
 import Dedekind.LoVelib
 import Dedekind.CutDefs
 import Dedekind.GroupOperationDefs
@@ -11,6 +10,8 @@ open Classical
 open dReal
 
 namespace comm.group
+
+--===================== Commutativity =====================
 
 theorem add_comm (a b : dReal) : a.add b = b.add a := by
   simp [dReal.add, dReal.addCut]
@@ -40,6 +41,8 @@ theorem add_comm (a b : dReal) : a.add b = b.add a := by
   have h1 : a + b = b + a := by ring
   rw [←h1] at ha
   exact ha.right
+
+--===================== Associativity =====================
 
 theorem add_assoc (a b c : dReal) : (a.add b).add c = a.add (b.add c) := by
   simp [dReal.add, dReal.addCut]
@@ -76,6 +79,8 @@ theorem add_assoc (a b c : dReal) : (a.add b).add c = a.add (b.add c) := by
   rw [←hc.right]
   ring
 
+--===================== Identity Addition =====================
+
 theorem zero_add (a : dReal) : dReal.zero.add a = a := by
   cases a with
     | mk cut hnt hcd hou =>
@@ -104,7 +109,7 @@ theorem add_zero (a : dReal) : a.add dReal.zero = a := by
   rw [add_comm]
   apply zero_add
 
-instance Negation : Neg dReal := ⟨dReal.neg⟩
+--===================== Inverse Addition =====================
 
 theorem add_left_neg (a : dReal) : (a.neg).add a = dReal.zero := by
   simp [dReal.neg, dReal.add, dReal.addCut, dReal.zero, dReal.negCut, Rat.todReal]
@@ -137,6 +142,8 @@ theorem add_left_neg (a : dReal) : (a.neg).add a = dReal.zero := by
   apply hn
   ring_nf
 
+--===================== AddCommGroup Instance =====================
+
 instance dReal_addcommgroup: AddCommGroup dReal where
   add := dReal.add
   add_assoc := add_assoc
@@ -150,6 +157,8 @@ instance dReal_addcommgroup: AddCommGroup dReal where
       (@nsmulRec _ ⟨dReal.zero⟩ ⟨dReal.add⟩)
   add_left_neg := add_left_neg
   add_comm := add_comm
+
+--===================== Some Additional Useful Lemmas about Addition =====================
 
   lemma zero_neg_is_zero : dReal.zero = dReal.zero.neg := by
   simp [dReal.zero, dReal.neg, dReal.negCut, Rat.todReal]
@@ -193,18 +202,6 @@ lemma neg_preserves_equality (a b : dReal) : a = b → a.neg = b.neg := by
   subst h
   simp_all only
 
--- do i need to prove this?
-lemma neg_distributes_over_addition (a b : dReal) : (a.add b).neg = a.neg.add b.neg := by
-  simp [dReal.neg, dReal.negCut, dReal.add, dReal.addCut]
-  ext x
-  apply Iff.intro
-  simp
-  intro p hp h
-  sorry
-  simp
-  intro y z hz0 hyz p q hq0 hpq hypx
-  sorry
-
 lemma sum_zero_inverse (a b : dReal) : a.add b = dReal.zero → a = b.neg := by
   intro h
   have hbneg : (a.add b).add b.neg = dReal.zero.add b.neg := by rw [h]
@@ -215,5 +212,16 @@ lemma sum_zero_inverse (a b : dReal) : a.add b = dReal.zero → a = b.neg := by
   rw [h1] at hbneg
   simp [add_zero] at hbneg
   apply hbneg
+
+lemma neg_distributes_over_addition (a b : dReal) : (a.add b).neg = a.neg.add b.neg := by
+  simp [dReal.neg, dReal.negCut, dReal.add, dReal.addCut]
+  ext x
+  apply Iff.intro
+  simp
+  intro p hp h
+  sorry
+  simp
+  intro y z hz0 hyz p q hq0 hpq hypx
+  sorry
 
   end comm.group

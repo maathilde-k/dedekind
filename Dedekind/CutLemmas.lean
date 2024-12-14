@@ -1,6 +1,5 @@
 import Mathlib.Data.Rat.Defs
 import Mathlib.Data.Rat.Floor
-import Mathlib.Algebra.Order.Archimedean
 import Dedekind.LoVelib
 import Dedekind.CutDefs
 
@@ -134,6 +133,5 @@ lemma nat_dedekind2 (a : dReal) (x : ℚ) (hx :x>0) : ∃ n : ℤ, n * x ∉ a.c
   apply dedekind_lemma2 a (((q/x).ceil+1)*x) q hq h2
 
 lemma nat_dedekind3 (a : dReal) (x : ℚ) (hx :x>0) : ∃ n : ℤ, n * x ∈ a.cut ∧ (n+1) * x ∉ a.cut := sorry
-
 
 end Dedekind.lemmas
