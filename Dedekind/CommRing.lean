@@ -1,6 +1,5 @@
 import Mathlib.Data.Rat.Defs
 import Mathlib.Data.Rat.Floor
-import Mathlib.Algebra.Order.Archimedean
 import Dedekind.LoVelib
 import Dedekind.CutDefs
 import Dedekind.GroupOperationDefs
@@ -15,22 +14,37 @@ open Classical
 open comm.group
 open dReal
 
-namespace Dedekind
+namespace dedekind.commring
 
-lemma posmul_zero (a : dReal) (ha : ispos a) : a.mul dReal.zero = dReal.zero := by
-  simp [dReal.mul, zero_not_pos, zero_not_neg]
+--==================== Some useful computational lemmas about rationals ====================--
 
-lemma zero_mul (a : dReal) : dReal.zero.mul a = dReal.zero := by
-  simp [dReal.mul]
-  by_cases h : ispos a
-  simp [h, zero_not_pos, zero_not_neg]
-  simp [h, zero_not_pos, zero_not_neg]
+lemma ineq_trans (x y z t: ℚ) (hy : y > 0) (hz : z > 0) (ht : t > 0) (hxy : x < z*y) (hyz : z < t) : x < y*t := by
+  calc
+    x < z * y := hxy
+    _ < t * y := by exact mul_lt_mul_of_pos_right hyz hy
+    _ = y * t := by rw [Rat.mul_comm t y]
 
-lemma mul_zero (a : dReal) : a.mul dReal.zero = dReal.zero := by
-  simp [dReal.mul]
-  by_cases h : ispos a
-  simp [h, zero_not_pos, zero_not_neg]
-  simp [h, zero_not_pos, zero_not_neg]
+lemma pq_lt_one (p q : ℚ) (hp : p > 0) (hq : q > p) : p/q < 1 := by
+  have hq0 : q > 0 := by linarith
+  apply (@div_lt_one _ _  p q hq0).mpr hq
+
+lemma pq_gt_one (p q : ℚ) (hp : p > 0) (hq : q > p) : q/p > 1 := by
+  apply (@one_lt_div _ _  q p hp).mpr hq
+
+lemma div_pos_pos (p q : ℚ) (hp : p > 0) (hq : q > 0) : p/q > 0 := by
+  exact div_pos hp hq
+
+lemma div_pos_preserve (p q r : ℚ) (hpq : p < q) (hr : r > 0) : p/r < q/r := by
+  rw [div_eq_mul_inv p r, div_eq_mul_inv q r]
+  apply mul_lt_mul_of_pos_right
+  exact hpq
+  exact inv_pos.mpr hr
+
+lemma simplify_identity (p q r : ℚ) (hpq : p < q) (hr : r > 0): p < r*(q/r) := by
+  rw [mul_div_cancel₀ q (ne_of_gt hr)]
+  exact hpq
+
+--==================== Proving that multiplication is commutative ====================--
 
 lemma posmul_pos (a b : dReal) (ha : ispos a) (hb : ispos b) : ispos (a.posmul b ha hb) := by
   simp [ispos, dReal.posmul, dReal.posmulCut]
@@ -83,7 +97,7 @@ lemma posmul_comm (a b : dReal) (ha : ispos a) (hb : ispos b) : a.posmul b ha hb
   apply hqb
   linarith
 
-lemma mul_comm (a b : dReal) : a.mul b = b.mul a := by
+theorem mul_comm (a b : dReal) : a.mul b = b.mul a := by
   simp [dReal.mul]
   by_cases ha : ispos a
   have hanotneg := pos_neg_exclusion a ha
@@ -165,6 +179,156 @@ lemma mul_comm (a b : dReal) : a.mul b = b.mul a := by
           simp [hb, hbneg, zero_not_pos, zero_not_neg, hbnotpos, hbnotz]
           apply posmul_comm
 
+--==================== Proving that multiplication by 0 is 0 ====================--
+
+theorem zero_mul (a : dReal) : dReal.zero.mul a = dReal.zero := by
+  simp [dReal.mul, zero_not_pos, zero_not_neg]
+
+theorem mul_zero (a : dReal) : a.mul dReal.zero = dReal.zero := by
+  -- this could also be proven with a simple simp, but let's use the fact that multiplication is commutative for fun
+  rw [mul_comm]
+  apply zero_mul
+
+--==================== Proving that multiplication by 1 is the identity ====================--
+
+lemma ispos_one : ispos dReal.one := by
+  simp [ispos, dReal.one, Rat.todReal]
+  use 0.5
+  apply And.intro
+  rfl
+  rfl
+
+lemma one_posmul (a : dReal) (ha : ispos a) : dReal.one.posmul a ispos_one ha = a := by
+  cases a with
+    | mk cut hnt hcd hou =>
+      simp [dReal.posmul, dReal.posmulCut , dReal.one, Rat.todReal, dReal.cut]
+      ext x
+      apply Iff.intro
+      simp
+      intro p hp0 hp1 q hq0 hq hqpx
+      have h0 : p*q < q := by simp_all only [mul_lt_iff_lt_one_left]
+      have h1 : x < q := by linarith
+      apply hcd q hq x h1
+      intro hx
+      simp
+      simp [ispos] at ha
+      obtain ⟨y, hy⟩ := ha
+      by_cases h : x ≤ 0
+      use 1/2
+      apply And.intro
+      rfl
+      apply And.intro
+      rfl
+      use y
+      apply And.intro
+      apply hy.right
+      apply And.intro
+      apply hy.left
+      have h2 := half_pos hy.right
+      have h3 : x < y/2 := by linarith
+      ring_nf at h3
+      linarith
+      simp at h
+      have h1 := hou x hx
+      obtain ⟨r, hr⟩ := h1
+      use x/r
+      apply And.intro
+      have h2 : r > 0 := by linarith
+      simp_all only [gt_iff_lt, div_pos_iff_of_pos_left]
+      apply And.intro
+      have hr0 : r > 0 := by linarith
+      apply pq_lt_one x r h hr.right
+      have h3 := hou r hr.left
+      obtain ⟨r', hr'⟩ := h3
+      use r'
+      apply And.intro
+      linarith
+      apply And.intro
+      apply hr'.left
+      have hr0 : r > 0 := by linarith
+      have hr'0 : r' > 0 := by linarith
+      have h4 : r'/r > 1 := pq_gt_one r r' hr0 hr'.right
+      have h5 :  x / r * r' = x * (r' / r) := by ring_nf
+      rw [h5]
+      simp_all only [gt_iff_lt, lt_mul_iff_one_lt_right]
+
+lemma posmul_one (a : dReal) (ha : ispos a) : a.posmul dReal.one ha ispos_one = a := by
+  cases a with
+    | mk cut hnt hcd hou =>
+      simp [dReal.posmul, dReal.posmulCut , dReal.one, Rat.todReal, dReal.cut]
+      ext x
+      apply Iff.intro
+      simp
+      intro p hp0 hp q hq0 hq hqpx
+      have h0 : p*q < p := by simp_all only [mul_lt_iff_lt_one_right]
+      have h1 : x < p := by linarith
+      apply hcd p hp x h1
+      intro hx
+      simp
+      simp [ispos] at ha
+      obtain ⟨y, hy⟩ := ha
+      by_cases h : x ≤ 0
+      use y
+      apply And.intro
+      apply hy.right
+      apply And.intro
+      apply hy.left
+      use 1/2
+      apply And.intro
+      rfl
+      apply And.intro
+      rfl
+      have h2 := half_pos hy.right
+      have h3 : x < y/2 := by linarith
+      linarith
+      obtain ⟨r, hr⟩ := hou x hx
+      obtain ⟨r', hr'⟩ := hou r hr.left
+      use r'
+      apply And.intro
+      linarith
+      apply And.intro
+      apply hr'.left
+      use r / r'
+      apply And.intro
+      have hr0 : r > 0 := by linarith
+      have h3 : r' > 0 := by linarith
+      apply div_pos hr0 h3
+      apply And.intro
+      have hr0 : r > 0 := by linarith
+      apply pq_lt_one r r' hr0 hr'.right
+      have hr'0 : r' > 0 := by linarith
+      apply simplify_identity x r r' hr.right hr'0
+
+theorem one_mul (a : dReal) : dReal.one.mul a = a := by
+  have h2 := pos_neg_exclusion dReal.one ispos_one
+  by_cases h : ispos a
+  simp [dReal.mul, h, ispos_one]
+  apply one_posmul a h
+  have h3 : isneg a ∨ a = dReal.zero:= by
+    have h4 := pos_or_neg_or_zero a
+    simp [h] at h4
+    apply h4
+  cases h3 with
+    | inr h4 =>
+      have h5 : ¬ ispos dReal.zero := by
+        apply zero_not_pos
+        rfl
+      have h6 : ¬ isneg dReal.zero := by
+        apply zero_not_neg
+        rfl
+      simp [dReal.mul, h, ispos_one, h2, h4, h5, h6]
+    | inl h4 =>
+      simp [dReal.mul, h, ispos_one, h2, h4]
+      have h5 : dReal.one.posmul a.neg ispos_one (isneg_neg a h4)= a.neg := one_posmul a.neg (isneg_neg a h4)
+      rw [h5]
+      apply negneg
+
+theorem mul_one (a : dReal) : a.mul dReal.one = a := by
+  rw [mul_comm]
+  apply one_mul
+
+--==================== Proving that multiplication is distributive ====================--
+
 lemma pos_left_distrib (a b c : dReal) (ha : ispos a) (hb : ispos b) (hc : ispos c) (hbc : ispos (b.add c)):  a.posmul (b.add c) ha hbc = (a.posmul b ha hb).add (a.posmul c ha hc) := by
   simp [dReal.posmul, dReal.posmulCut, dReal.add, dReal.addCut]
   simp_all [ispos]
@@ -178,32 +342,10 @@ lemma pos_left_distrib (a b c : dReal) (ha : ispos a) (hb : ispos b) (hc : ispos
     apply And.intro
     apply hrb
     use s
-  -- work out by hand first
   rw [hrsq.symm] at hxpq
-  use x - p*s -- not quite, need a small adjustment to get precise equality
-  apply And.intro
-  use p
-  apply And.intro
-  apply hp0
-  apply And.intro
-  apply hpa
-  use r
-  apply And.intro
-  -- somehow want to reduce to the fact that we can choose r and s such that they are both positive
-  sorry
-  apply And.intro
-  apply hrb
-  linarith
-  use x - p*r
-  apply And.intro
-  use p
-  apply And.intro
-  apply hp0
-  apply And.intro
-  apply hpa
-  use s
-  sorry --see comment above
-
+  /- to finish this proof, we would need to be able to prove that if `x > 0`
+  and `x = r + s` where `r ∈ a.cut` and `s ∈ b.cut` with `a` and `b` positive,
+  then `x = r' + s'` where `r' ∈ a.cut` and `s' ∈ b.cut` with `r' > 0` and `s' > 0`. -/
   sorry
   simp
   intro u y hy0 hya z hz0 hzb hxyz p q hq0 hqa r hr0 hrc hpqr hupx
@@ -217,7 +359,8 @@ lemma pos_left_distrib_cneg (a b c : dReal) (ha : ispos a) (hb : ispos b) (hc : 
   simp [dReal.posmul, dReal.posmulCut, dReal.add, dReal.addCut, pos_left_distrib]
   sorry
 
-lemma left_distrib (a b c : dReal) : a.mul (b.add c) = (a.mul b).add (a.mul c) := by
+-- an echauche of what the proof by cases would look like
+theorem left_distrib (a b c : dReal) : a.mul (b.add c) = (a.mul b).add (a.mul c) := by
   simp [dReal.mul]
   by_cases ha : ispos a
   simp [ha]
@@ -573,14 +716,10 @@ lemma left_distrib (a b c : dReal) : a.mul (b.add c) = (a.mul b).add (a.mul c) :
               simp [h0, h1]
               sorry -- new lemma?
 
-lemma right_distrib (a b c : dReal) : (a.add b).mul c = (a.mul c).add (b.mul c) := by
+theorem right_distrib (a b c : dReal) : (a.add b).mul c = (a.mul c).add (b.mul c) := by
   rw [mul_comm, mul_comm a c, mul_comm b c, left_distrib]
 
-lemma ineq_trans (x y z t: ℚ) (hy : y > 0) (hz : z > 0) (ht : t > 0) (hxy : x < z*y) (hyz : z < t) : x < y*t := by
-  calc
-    x < z * y := hxy
-    _ < t * y := by exact mul_lt_mul_of_pos_right hyz hy
-    _ = y * t := by rw [Rat.mul_comm t y]
+--==================== Proving that multiplication is associative ====================--
 
 lemma posmul_assoc (a b c : dReal) (ha : ispos a) (hb : ispos b) (hc : ispos c) : (a.posmul b ha hb).posmul c (posmul_pos a b ha hb) hc = a.posmul (b.posmul c hb hc) ha (posmul_pos b c hb hc) := by
   simp [dReal.posmul, dReal.posmulCut]
@@ -651,7 +790,11 @@ lemma posmul_assoc (a b c : dReal) (ha : ispos a) (hb : ispos b) (hc : ispos c) 
   rw [hcalc3.symm]
   apply hcalc2
 
-lemma mul_assoc (a b c : dReal) : (a.mul b).mul c = a.mul (b.mul c) := by
+/- the beginning of the proof that multiplication is associative
+  to properly finish this proof, we would need to prove at least two more lemmas
+  of the same flavor as `posmul_assoc` but with negatives inserted -/
+
+theorem mul_assoc (a b c : dReal) : (a.mul b).mul c = a.mul (b.mul c) := by
   simp [dReal.mul]
   by_cases ha : ispos a
   have hanotneg := pos_neg_exclusion a ha
@@ -732,181 +875,7 @@ lemma mul_assoc (a b c : dReal) : (a.mul b).mul c = a.mul (b.mul c) := by
       sorry
   sorry
 
-lemma ispos_one : ispos dReal.one := by
-  simp [ispos, dReal.one, Rat.todReal]
-  use 0.5
-  apply And.intro
-  rfl
-  rfl
-
-lemma pq_lt_one (p q : ℚ) (hp : p > 0) (hq : q > p) : p/q < 1 := by
-  have hq0 : q > 0 := by linarith
-  apply (@div_lt_one _ _  p q hq0).mpr hq
-
-lemma pq_gt_one (p q : ℚ) (hp : p > 0) (hq : q > p) : q/p > 1 := by
-  apply (@one_lt_div _ _  q p hp).mpr hq
-
-lemma div_pos_pos (p q : ℚ) (hp : p > 0) (hq : q > 0) : p/q > 0 := by
-  exact div_pos hp hq
-
-lemma div_pos_preserve (p q r : ℚ) (hpq : p < q) (hr : r > 0) : p/r < q/r := by
-  rw [div_eq_mul_inv p r, div_eq_mul_inv q r]
-  apply mul_lt_mul_of_pos_right
-  exact hpq
-  exact inv_pos.mpr hr
-
-lemma simplify_identity (p q r : ℚ) (hpq : p < q) (hr : r > 0): p < r*(q/r) := by
-  rw [mul_div_cancel₀ q (ne_of_gt hr)]
-  exact hpq
-
-lemma one_posmul (a : dReal) (ha : ispos a) : dReal.one.posmul a ispos_one ha = a := by
-  cases a with
-    | mk cut hnt hcd hou =>
-      simp [dReal.posmul, dReal.posmulCut , dReal.one, Rat.todReal, dReal.cut]
-      ext x
-      apply Iff.intro
-      simp
-      intro p hp0 hp1 q hq0 hq hqpx
-      have h0 : p*q < q := by simp_all only [mul_lt_iff_lt_one_left]
-      have h1 : x < q := by linarith
-      apply hcd q hq x h1
-      intro hx
-      simp
-      simp [ispos] at ha
-      obtain ⟨y, hy⟩ := ha
-      by_cases h : x ≤ 0
-      use 1/2
-      apply And.intro
-      rfl
-      apply And.intro
-      rfl
-      use y
-      apply And.intro
-      apply hy.right
-      apply And.intro
-      apply hy.left
-      have h2 := half_pos hy.right
-      have h3 : x < y/2 := by linarith
-      ring_nf at h3
-      linarith
-      simp at h
-      have h1 := hou x hx
-      obtain ⟨r, hr⟩ := h1
-      use x/r
-      apply And.intro
-      have h2 : r > 0 := by linarith
-      simp_all only [gt_iff_lt, div_pos_iff_of_pos_left]
-      apply And.intro
-      have hr0 : r > 0 := by linarith
-      apply pq_lt_one x r h hr.right
-      have h3 := hou r hr.left
-      obtain ⟨r', hr'⟩ := h3
-      use r'
-      apply And.intro
-      linarith
-      apply And.intro
-      apply hr'.left
-      have hr0 : r > 0 := by linarith
-      have hr'0 : r' > 0 := by linarith
-      have h4 : r'/r > 1 := pq_gt_one r r' hr0 hr'.right
-      have h5 :  x / r * r' = x * (r' / r) := by ring_nf
-      rw [h5]
-      simp_all only [gt_iff_lt, lt_mul_iff_one_lt_right]
-
-lemma posmul_one (a : dReal) (ha : ispos a) : a.posmul dReal.one ha ispos_one = a := by
-  cases a with
-    | mk cut hnt hcd hou =>
-      simp [dReal.posmul, dReal.posmulCut , dReal.one, Rat.todReal, dReal.cut]
-      ext x
-      apply Iff.intro
-      simp
-      intro p hp0 hp q hq0 hq hqpx
-      have h0 : p*q < p := by simp_all only [mul_lt_iff_lt_one_right]
-      have h1 : x < p := by linarith
-      apply hcd p hp x h1
-      intro hx
-      simp
-      simp [ispos] at ha
-      obtain ⟨y, hy⟩ := ha
-      by_cases h : x ≤ 0
-      use y
-      apply And.intro
-      apply hy.right
-      apply And.intro
-      apply hy.left
-      use 1/2
-      apply And.intro
-      rfl
-      apply And.intro
-      rfl
-      have h2 := half_pos hy.right
-      have h3 : x < y/2 := by linarith
-      linarith
-      obtain ⟨r, hr⟩ := hou x hx
-      obtain ⟨r', hr'⟩ := hou r hr.left
-      use r'
-      apply And.intro
-      linarith
-      apply And.intro
-      apply hr'.left
-      use r / r'
-      apply And.intro
-      have hr0 : r > 0 := by linarith
-      have h3 : r' > 0 := by linarith
-      apply div_pos hr0 h3
-      apply And.intro
-      have hr0 : r > 0 := by linarith
-      apply pq_lt_one r r' hr0 hr'.right
-      have hr'0 : r' > 0 := by linarith
-      apply simplify_identity x r r' hr.right hr'0
-
-lemma one_mul (a : dReal) : dReal.one.mul a = a := by
-  have h2 := pos_neg_exclusion dReal.one ispos_one
-  by_cases h : ispos a
-  simp [dReal.mul, h, ispos_one]
-  apply one_posmul a h
-  have h3 : isneg a ∨ a = dReal.zero:= by
-    have h4 := pos_or_neg_or_zero a
-    simp [h] at h4
-    apply h4
-  cases h3 with
-    | inr h4 =>
-      have h5 : ¬ ispos dReal.zero := by
-        apply zero_not_pos
-        rfl
-      have h6 : ¬ isneg dReal.zero := by
-        apply zero_not_neg
-        rfl
-      simp [dReal.mul, h, ispos_one, h2, h4, h5, h6]
-    | inl h4 =>
-      simp [dReal.mul, h, ispos_one, h2, h4]
-      have h5 : dReal.one.posmul a.neg ispos_one (isneg_neg a h4)= a.neg := one_posmul a.neg (isneg_neg a h4)
-      rw [h5]
-      apply negneg
-
-lemma mul_one (a : dReal) : a.mul dReal.one = a := by
-  have h2 := pos_neg_exclusion dReal.one ispos_one
-  by_cases h : ispos a
-  simp [dReal.mul, h, ispos_one]
-  apply posmul_one a h
-  have h3 : isneg a ∨ a = dReal.zero := by
-    have h4 := pos_or_neg_or_zero a
-    simp [h] at h4
-    apply h4
-  cases h3 with
-    | inr h4 =>
-      have h5 : ¬ ispos dReal.zero := by
-        apply zero_not_pos
-        rfl
-      have h6 : ¬ isneg dReal.zero := by
-        apply zero_not_neg
-        rfl
-      simp [dReal.mul, h, ispos_one, h2, h4, h5, h6]
-    | inl h4 =>
-      simp [dReal.mul, h, ispos_one, h2, h4, negneg]
-      have h4 := posmul_one a.neg (isneg_neg a h4)
-      rw [h4]
-      apply negneg
+--==================== Dedekind cuts form a commutative ring ====================--
 
 noncomputable instance dReal_ring : Ring dReal :=
   {
@@ -928,4 +897,4 @@ noncomputable instance : CommRing dReal :=
   mul_comm := mul_comm
   }
 
-end Dedekind
+end dedekind.commring

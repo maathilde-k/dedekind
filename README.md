@@ -90,11 +90,11 @@ Before definining multiplication, we have to define what is meant by positive an
 `ispos` and `isneg` are propositions embodying the sign of a Dedekind cut. From there, `SignLemmas.lean` contains many useful lemmas on the sign of Dedekind Cuts: mutual exclusion, how they behave under addition and negation, ...
 
 In the file `RingOperationDefs.lean`, we definine the multiplicative identity (`dReal.one = RatToReal 1`) and multiplication. Multiplication is surprisingly difficult to define. First we define multiplication for positive cuts, `posmul`. Then we define multiplication by cases on the sign of the Dedekind cut. Let `a` and `b` be Dedekind cuts. `a.mul b` is equal to:
-    - `a.posmul b` if `a` and `b` are positive
-    - `(a.posmul b.neg).neg` if `a` is positive and `b` is negative
-    - `(a.neg.posmul b).neg` if `a` is negative and `b` is positive
-    - `a.neg.posmul b.neg` if `a` and `b` are negative
-    - `dReal.zero` if either of them is zero.
+  - `a.posmul b` if `a` and `b` are positive
+  - `(a.posmul b.neg).neg` if `a` is positive and `b` is negative
+  - `(a.neg.posmul b).neg` if `a` is negative and `b` is positive
+  - `a.neg.posmul b.neg` if `a` and `b` are negative
+  - `dReal.zero` if either of them is zero.
 This case by case definition makes proving certain theorems quite difficult, specifically those involving three separate Dedekind cuts.
 
 In `CommRing.lean` we begin to prove that Dedekind cuts form a commutative ring. We successfully prove `zero_mul` and `mul_zero`, `mul_one`, `one_mul`, and `mul_com`, each time by proving these properties for the positive cuts before generalizing.
