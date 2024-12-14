@@ -2,7 +2,7 @@ import Mathlib.Data.Rat.Defs
 import Mathlib.Data.Rat.Floor
 import Mathlib.Algebra.Order.Archimedean
 import Dedekind.LoVelib
-import Dedekind.Cut_Defs
+import Dedekind.CutDefs
 import Dedekind.CutLemmas
 import Dedekind.GroupOperationDefs
 import Dedekind.SignDefs
@@ -23,21 +23,19 @@ def dReal.posmul (a b: dReal) (ha : ispos a) (hb : ispos b): dReal :=
       obtain ⟨q, hq⟩ := hb
       have hp2 := half_pos hp.right
       have hp2p : p > p/2 := by linarith
-      have hp2a := a.closedDownwards p hp.left (p/2) hp2p
       have hq2 := half_pos hq.right
       have hq2q : q > q/2 := by linarith
-      have hq2b := b.closedDownwards q hq.left (q/2) hq2q
       use p*q/6
       use p/2
       apply And.intro
       apply hp2
       apply And.intro
-      apply hp2a
+      apply a.closedDownwards p hp.left (p/2) hp2p
       use q/2
       apply And.intro
       apply hq2
       apply And.intro
-      apply hq2b
+      apply b.closedDownwards q hq.left (q/2) hq2q
       have hcalc : p / 2 * (q / 2) = p * q / 4 := by ring
       rw [hcalc]
       have hcalc2 : p * q / 4 > p * q / 6 := by

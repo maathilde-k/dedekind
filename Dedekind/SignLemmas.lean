@@ -2,7 +2,7 @@ import Mathlib.Data.Rat.Defs
 import Mathlib.Data.Rat.Floor
 import Mathlib.Algebra.Order.Archimedean
 import Dedekind.LoVelib
-import Dedekind.Cut_Defs
+import Dedekind.CutDefs
 import Dedekind.CutLemmas
 import Dedekind.GroupOperationDefs
 import Dedekind.SignDefs
