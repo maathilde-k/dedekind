@@ -8,13 +8,13 @@ import Dedekind.AddCommGroup
 import Dedekind.SignDefs
 import Dedekind.SignLemmas
 import Dedekind.RingOperationDefs
+open Classical
 open Dedekind.lemmas
 open sign.lemmas
-open Classical
 open comm.group
 open dReal
 
-namespace dedekind.commring
+namespace comm.ring
 
 --==================== Some useful computational lemmas about rationals ====================--
 
@@ -893,4 +893,4 @@ noncomputable instance : CommRing dReal :=
   mul_comm := mul_comm
   }
 
-end dedekind.commring
+end comm.ring

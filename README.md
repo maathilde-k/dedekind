@@ -1,22 +1,21 @@
-# An attempt to formalize Dedekind cuts in Lean 4
+# Dedekind cuts: The *real* way to define the Reals
 
-This repository contains an ebauche of formalization for Dedekind cuts. 
+In 1872, Dedekind and Cantor both proposed the first constructions of the Real numbers. Cantor used Cauchy sequences, while Dedekind proposed something called Dedekind cuts. While in my opinion, Dedekind cuts make for a more elegant, natural and intuitive construction of the real numbers, Cauchy sequences are a more pedagogical choice and are what is taught in most introductory analysis classes. (Cantor stole everything from Dedekind)
 
-We define addition, negation, and multiplication and prove important properties about these operations.
+This repository contains a formalization for Dedekind cuts, with the goal of proving that they form a commutative ring. We define addition, negation, and multiplication and prove important properties about these operations. Distributivity and associativity of multiplication are left as an exercise to the reader.
 
 ## Project Structure
 
 - **`README.md`**: Documentation for the project.
 - **`Dedekind/`**: Contains the Lean source files.
   - `CutDefs.lean`: Definition of Dedekind cuts and basic properties.
-  - `CutLemmas.lean`: Foundational lemmas for Dedekind cuts.
-  - `GroupOperationDefs.lean`: Definitions of addition, negation, and their identities.
+  - `CutLemmas.lean`: Basic lemmas for Dedekind cuts.
+  - `GroupOperationDefs.lean`: Definitions of addition, negation, and the additive identity.
   - `AddCommGroup.lean`: Proofs of group properties under addition.
   - `SignDefs.lean` and `SignLemmas.lean`: Definitions and lemmas for positivity and negativity of cuts.
-  - `RingOperationDefs.lean`: Definitions for multiplication and related properties.
-  - `CommRing.lean`: Proofs that Dedekind cuts form a commutative ring.
+  - `RingOperationDefs.lean`: Definitions for multiplication multiplicative identity.
+  - `CommRing.lean`: Some proofs that Dedekind cuts form a commutative ring.
   - `LoVelib.lean`: Utility functions and additional definitions.
-
 
 ## Dedekind Cuts
 
@@ -31,8 +30,6 @@ A subset `α ⊂ ℚ` is called a *cut* if it satisfies the following properties
 3. *Open Upwards*: If `p ∈ α`, then `p < r` for some `r ∈ α`
 
 This is formalized by the structure `dReal` in `Dedekind.CutDefs.lean`.
-
-Those cuts as a construction of the real numbers were first proposed by Dedekind in 1872, the same year that Cantor used Cauchy sequences to construct the real numbers. While in my opinion, Dedekind cuts make for a more elegant, natural and intuitive construction of the real numbers, Cauchy sequences are a more pedagogical choice and is what is taught in most introductory analysis classes. (Cantor stole everything from Dedekind)
 
 Rational numbers are a subset of the reals, so for each rational number `r`, we may associate a cut `Rat.todReal r = {x ∈ ℚ | x < r}`. This clearly satisfies the condition that  `Rat.todReal r` is non-trivial, since it contains `r-1` and excludes `r`, and is closed downwards and open upwards.
 
