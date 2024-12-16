@@ -361,7 +361,7 @@ lemma pos_left_distrib_cneg (a b c : dReal) (ha : ispos a) (hb : ispos b) (hc : 
   simp [dReal.posmul, dReal.posmulCut, dReal.add, dReal.addCut, pos_left_distrib]
   sorry
 
--- an echauche of what the proof by cases would look like
+-- an echauche of what the proof by cases would look like, the sorries are placeholders for the meultiple lemmas about positive left distributivity
 theorem left_distrib (a b c : dReal) : a.mul (b.add c) = (a.mul b).add (a.mul c) := by
   simp [dReal.mul]
   by_cases ha : ispos a
@@ -428,8 +428,7 @@ theorem left_distrib (a b c : dReal) : a.mul (b.add c) = (a.mul b).add (a.mul c)
             apply zero_not_neg (b.add c) h
             exact hbcneg
           simp [hbc, hbcneg, hbcnotz]
-          -- rip need more cases
-          sorry -- need new lemma?
+          sorry
   have hbnegz : isneg b ∨ b = dReal.zero := by
     have h1 := pos_or_neg_or_zero b
     simp [hb] at h1
@@ -508,7 +507,7 @@ theorem left_distrib (a b c : dReal) : a.mul (b.add c) = (a.mul b).add (a.mul c)
             apply zero_not_neg (b.add c) h
             exact hbcneg
           simp [hbc, hbcneg, hbcnotz]
-          sorry -- need new lemma?
+          sorry
       have hcnegz : isneg c ∨ c = dReal.zero := by
         have h1 := pos_or_neg_or_zero c
         simp [hc] at h1
@@ -545,11 +544,7 @@ theorem left_distrib (a b c : dReal) : a.mul (b.add c) = (a.mul b).add (a.mul c)
           have heqneg2 : a.posmul (b.add c).neg ha hbaddcneg =  (a.posmul b.neg ha hbneg_pos).add (a.posmul c.neg ha hcneg_pos) := by
             simp [neg_distrib]
             apply heqneg
-          --simp [←neg_distrib]
-          --apply neg_preserves_equality (a.posmul (b.add c).neg _ _) ((a.posmul b.neg _ _).add (a.posmul c.neg _ _))
-          --simp [neg_preserves_equality] at heqneg2
-          -- neg needs taking out
-          sorry -- taking a break from this, probably need to use neg_preserves_equality, but first take out the neg of addition
+          sorry
   simp [ha]
   have hanegz : isneg a ∨ a = dReal.zero := by
     have h1 := pos_or_neg_or_zero a
@@ -573,8 +568,7 @@ theorem left_distrib (a b c : dReal) : a.mul (b.add c) = (a.mul b).add (a.mul c)
       have hbc := pos_add b c hb hc
       have hbcnotneg := pos_neg_exclusion (b.add c) hbc
       simp_all [hbc, neg_pos_exclusion, pos_neg_exclusion]
-      -- take out the neg and use some previous lemma
-      sorry -- new lemma?
+      sorry
       have hcnegz : isneg c ∨ c = dReal.zero := by
         have h1 := pos_or_neg_or_zero c
         simp [hc] at h1
@@ -601,7 +595,7 @@ theorem left_distrib (a b c : dReal) : a.mul (b.add c) = (a.mul b).add (a.mul c)
           simp [h0]
           by_cases hbc : ispos (b.add c)
           simp [hbc, pos_neg_exclusion]
-          sorry -- need new lemma?
+          sorry
           have hbcnegz : isneg (b.add c) ∨ b.add c = dReal.zero := by
             have h1 := pos_or_neg_or_zero (b.add c)
             simp [hbc] at h1
@@ -630,7 +624,7 @@ theorem left_distrib (a b c : dReal) : a.mul (b.add c) = (a.mul b).add (a.mul c)
                 apply zero_not_neg (b.add c) h
                 apply hbcneg
               simp [hbc, hbcneg, hbcnotz]
-              sorry -- need new lemma?
+              sorry
       have hbnegz : isneg b ∨ b = dReal.zero := by
         have h1 := pos_or_neg_or_zero b
         simp [hb] at h1
@@ -657,7 +651,7 @@ theorem left_distrib (a b c : dReal) : a.mul (b.add c) = (a.mul b).add (a.mul c)
           simp [hc]
           by_cases hbc : ispos (b.add c)
           simp [hbc]
-          sorry -- need additional lemma?
+          sorry
           simp [hbc]
           have hbcnegz : isneg (b.add c) ∨ b.add c = dReal.zero := by
             have h1 := pos_or_neg_or_zero (b.add c)
@@ -691,7 +685,7 @@ theorem left_distrib (a b c : dReal) : a.mul (b.add c) = (a.mul b).add (a.mul c)
                 apply hbcneg
               have h0 := pos_neg_exclusion c hc
               simp [hbc, hbcneg, hbcnotz, neg_pos_exclusion, pos_neg_exclusion, h0, zero_not_neg, zero_not_pos]
-              sorry -- need new lemma?
+              sorry
           have hcnegz : isneg c ∨ c = dReal.zero := by
             have h1 := pos_or_neg_or_zero c
             simp [hc] at h1
@@ -716,7 +710,7 @@ theorem left_distrib (a b c : dReal) : a.mul (b.add c) = (a.mul b).add (a.mul c)
               have h0 : isneg (b.add c) := by sorry
               have h1 := neg_pos_exclusion (b.add c) h0
               simp [h0, h1]
-              sorry -- new lemma?
+              sorry
 
 theorem right_distrib (a b c : dReal) : (a.add b).mul c = (a.mul c).add (b.mul c) := by
   rw [mul_comm, mul_comm a c, mul_comm b c, left_distrib]
